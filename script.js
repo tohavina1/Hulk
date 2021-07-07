@@ -128,7 +128,7 @@ function movePlayer() {
             player.y = last_pos;
             player.frameY = last_fram;
         }
-        detectColision_Barrel('UP');
+        //detectColision_Barrel('UP');
     }
     //Down
     if (keys[40] && player.y < canvas.height - player.height && player.moving) {
@@ -140,7 +140,7 @@ function movePlayer() {
             player.y = last_pos;
             player.frameY = last_fram;
         }
-        detectColision_Barrel('DOWN');
+        //detectColision_Barrel('DOWN');
 
     }
     //left
@@ -153,7 +153,7 @@ function movePlayer() {
             player.x = last_pos;
             player.frameY = last_fram;
         }
-        detectColision_Barrel('LEFT');
+        //detectColision_Barrel('LEFT');
 
     }
 
@@ -167,9 +167,10 @@ function movePlayer() {
             player.x = last_pos;
             player.frameY = last_fram;
         }
-        detectColision_Barrel('RIGHT');
+        //detectColision_Barrel('RIGHT');
 
     }
+    detectColision_Barrel('RIGHT');
 }
 function handlePlayerFrame() {
     if (player.frameX < 3 && player.moving) player.frameX++;
@@ -183,6 +184,7 @@ function starAnimating(fps) {
     then = Date.now();
     startTime = then;
     animate();
+    //mooveBare();
 }
 function getRndInteger(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -265,66 +267,47 @@ function detectColision() {
 }
 function detectColision_Barrel(keyCode) {
     for(let barrel of barrels){
-        if (checkConditionCollide(player, barrel) || checkConditionCollide(barrel, player)
+        if (checkConditionCollide(barrel, player)  || checkConditionCollide(player, barrel)
         ) {
             console.log("Player : " + player.x + " " + player.y + "  and Barrel : " + barrel.x + " " + barrel.y);
             console.log("collision");
-            //person.dead = true;
-            //player.moving = false;
-            switch(keyCode) {
-                case 'UP':
-                    barrel.y -= player.speed;
-                  break;
-                case 'DOWN':
-                    barrel.y += player.speed;
-                  break;
-                case 'RIGHT':
-                    barrel.x += player.speed;
-                  break;
-                case 'LEFT':
-                    barrel.x -= player.speed;
-                  break;
-                default:
-                  // code block
-              }
+            barrel.x = 0;
+            barrel.y = 0;
+            }
 
         }
-        if (checkConditionCollide2(hole, barrel) || checkConditionCollide2(barrel, hole)){
-            const index = barrels.indexOf(barrel);
-            if (index > -1) {
-                barrels.splice(index, 1);
-            }
-        }
+        return false;
     }
 
+
+function mooveBare(){
+    //ctx.clearRect(barrels[0].x-1, barrels[0].y, barrels[0].width, barrels[0].height);
+    for(let barrel of barrels){
+        ctx.drawImage(barrelSprite, barrel.x, barrel.y, barrel.width, barrel.height);
+        barrel.x +=1;
+        barrel.y +=1;
+    }
+    //requestAnimationFrame(mooveBare);
 }
 function animate() {
 
     now = Date.now();
     elapsed = now - then;
-
-    if (elapsed > fpsInterval) {
-        then = now - (elapsed % fpsInterval);
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
-        drawHole();
-        for(let person of tree){
-            if (!person.dead) {
-                drawSprite(personSprite, person.frameX * person.width, person.frameY * person.height, person.width, person.height, person.x, person.y, person.width, person.height);
-            } else {
-                createRandomPerson();
-            }
-        }
-        for(let barrel of barrels){
-            ctx.drawImage(barrelSprite, barrel.x, barrel.y, barrel.width, barrel.height);
-        }
-        drawSprite(playerSprite, player.frameX * player.width, player.frameY * player.height, player.width, player.height, player.x, player.y, player.width, player.height);
-
-        movePlayer();
-        
-        handlePlayerFrame();
-    }
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
+    mooveBare();
+    PlayerControl();
     requestAnimationFrame(animate);
 }
-
+function PlayerControl(){
+    
+    drawSprite(playerSprite, player.frameX * player.width, player.frameY * player.height, player.width, player.height, player.x, player.y, player.width, player.height);
+    if (elapsed > fpsInterval) {
+        then = now - (elapsed % fpsInterval);
+        movePlayer();
+    
+        handlePlayerFrame();
+    }
+    
+}
 starAnimating(10);
