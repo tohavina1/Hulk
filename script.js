@@ -2,6 +2,7 @@ const canvas = document.getElementById('canvas1');
 const ctx = canvas.getContext('2d');
 canvas.width = 512;
 canvas.height = 512;
+var lifePoint = 20 ;
 class Coordinate {
 
     constructor(x, y) {
@@ -15,13 +16,21 @@ var barrels = [
     x:10,
     y:10,
     width: 40,
-    height: 40
+    height: 40,
+    default_x : 10,
+    default_y : 10,
+    dirX :4,
+    dirY : 0
 },
 {
     x:100,
     y:200,
     width: 40,
-    height: 40
+    height: 40,
+    default_x : 100,
+    default_y : 200,
+    dirX :4,
+    dirY : 5
 },
 ];
 const hole = {
@@ -77,7 +86,7 @@ function drawHole(){
 }
 function drawSprite(img, sX, sY, sW, sH, dX, dY, dW, dH) {
     ctx.drawImage(img, sX, sY, sW, sH, dX, dY, dW, dH);
-    ctx.strokeRect(dX, dY, dW, dH);
+    //ctx.strokeRect(dX, dY, dW, dH);
 }
 /*function animate(){
    ctx.clearRect(0, 0, canvas.width,canvas.height);
@@ -271,21 +280,34 @@ function detectColision_Barrel(keyCode) {
         ) {
             console.log("Player : " + player.x + " " + player.y + "  and Barrel : " + barrel.x + " " + barrel.y);
             console.log("collision");
-            barrel.x = 0;
-            barrel.y = 0;
+            //barrel.x = barrel.default_x;
+            //barrel.y = barrel.default_y;
+            removeElementFromArray(barrels,barrel);
+            lifePoint--;
+            document.getElementById("life").textContent="Vie: "+lifePoint;
             }
 
         }
         return false;
     }
 
-
+function removeElementFromArray(array,element){
+    const index = array.indexOf(element);
+    if (index > -1) {
+    array.splice(index, 1);
+    }
+}
 function mooveBare(){
     //ctx.clearRect(barrels[0].x-1, barrels[0].y, barrels[0].width, barrels[0].height);
+    var that = this;
     for(let barrel of barrels){
+        if(barrel.x>512 || barrel.y>512){
+            removeElementFromArray(barrels,barrel);
+        }
         ctx.drawImage(barrelSprite, barrel.x, barrel.y, barrel.width, barrel.height);
-        barrel.x +=1;
-        barrel.y +=1;
+            barrel.x +=barrel.dirX;
+            barrel.y +=barrel.dirY;
+        
     }
     //requestAnimationFrame(mooveBare);
 }
@@ -310,4 +332,24 @@ function PlayerControl(){
     }
     
 }
-starAnimating(10);
+function fillBarrel(){
+    setInterval(() => {
+        console.log("hello");
+        const x = getRndInteger(0, 500);
+    const y = getRndInteger(0, 500);
+    const randomdirX = getRndInteger(2, 6);
+    const randomdirY = getRndInteger(2, 6);
+        barrels.push({
+            x:x,
+            y:y,
+            width: 40,
+            height: 40,
+            default_x : x,
+            default_y : y,
+            dirX :randomdirX,
+            dirY : randomdirY
+        })
+    }, 500);
+}
+starAnimating(20);
+fillBarrel();
